@@ -28,7 +28,7 @@ const makeGrid = (rand = 0) => {
 function App() {
   const [grid, setGrid] = useState(() => makeGrid(0.3));
   const [isRunning, setIsRunning] = useState(false);
-  const [speed, setSpeed] = useState(7);
+  const [speed, setSpeed] = useState(5);
   const [genCount, setGenCount] = useState(0);
 
   const runningRef = useRef(isRunning);
@@ -85,15 +85,17 @@ function App() {
   //CSS
   const gridContainerCSS: React.CSSProperties = {
     display: "grid",
+    // gap: "1px",
     gridTemplateColumns: `repeat(${NUM_COLS}, 20px)`,
     gridTemplateRows: `repeat(${NUM_ROWS}, 20px)`,
   };
   const gridBoxCSS = (i: number, j: number): React.CSSProperties => {
     return {
       border: "1px solid black",
-      height: "20px",
-      width: "20px",
-      backgroundColor: grid[i][j] ? "#93c5cc" : undefined,
+      height: "21px",
+      width: "21px",
+      // borderRadius: "4px",
+      backgroundColor: grid[i][j] ? "#93c5cc" : "#ffffff",
     };
   };
 
@@ -123,10 +125,10 @@ function App() {
             }
           }}
         >
-          {isRunning ? "Stop" : "Start"}
+          {isRunning ? "Pause" : "Start"}
         </button>
       </form>
-      <label htmlFor="speed-range"> speed: {speed} gen per second</label>
+      <label htmlFor="speed-range">speed: {speed} generations per second</label>
       <div className="grid-container" style={gridContainerCSS}>
         {grid.map((rows, i) =>
           rows.map((box, j) => {
@@ -146,8 +148,8 @@ function App() {
           })
         )}
       </div>
-      {genCount} genrations {grid.flat(2).filter((item) => item === 1).length}{" "}
-      alive
+      genration: {genCount}, alive:{" "}
+      {grid.flat(2).filter((item) => item === 1).length}
       <div className="btn-controls">
         <button
           onClick={() => {
@@ -159,7 +161,7 @@ function App() {
         <button
           onClick={() => {
             reset();
-            setGrid(() => makeGrid(0.2));
+            setGrid(() => makeGrid(0.3));
           }}
         >
           Randomize
