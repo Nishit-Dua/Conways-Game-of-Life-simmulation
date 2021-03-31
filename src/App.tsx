@@ -15,23 +15,33 @@ const operations = [
   [1, -1],
 ];
 
-const makeGrid = () => {
+const makeGrid = (rand = 0) => {
   const rows = [];
   for (let i = 0; i < NUM_ROWS; i++) {
-    rows.push(Array.from(Array(NUM_COLS), () => 0));
+    rows.push(
+      Array.from(Array(NUM_COLS), () => (Math.random() >= rand ? 0 : 1))
+    );
   }
   return rows;
 };
+
 function App() {
-  const [grid, setGrid] = useState(() => makeGrid());
+  const [grid, setGrid] = useState(() => makeGrid(0.3));
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(7);
   const [genCount, setGenCount] = useState(0);
 
   const runningRef = useRef(isRunning);
+  console.log(isRunning);
   runningRef.current = isRunning;
   const speedRef = useRef(speed);
   speedRef.current = speed;
+
+  const reset = () => {
+    setGrid(() => makeGrid());
+    setGenCount(0);
+    setIsRunning(false);
+  };
 
   // Fxn Wont be Made every render so we use refs
   const runSimmulation = useCallback(() => {
@@ -83,33 +93,39 @@ function App() {
       border: "1px solid black",
       height: "20px",
       width: "20px",
-      backgroundColor: grid[i][j] ? "#919191" : undefined,
+      backgroundColor: grid[i][j] ? "#93c5cc" : undefined,
     };
   };
 
   return (
     <main>
-      <button
-        onClick={() => {
-          setIsRunning(!isRunning);
-          if (!isRunning) {
-            runningRef.current = true;
-            runSimmulation();
-          }
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
         }}
       >
-        {isRunning ? "Stop" : "Start"}
-      </button>
-      <input
-        id="speed-range"
-        type="range"
-        min="1"
-        max="20"
-        value={speed}
-        onChange={(e) => {
-          setSpeed(parseInt(e.target.value));
-        }}
-      />
+        <input
+          id="speed-range"
+          type="range"
+          min="1"
+          max="20"
+          value={speed}
+          onChange={(e) => {
+            setSpeed(parseInt(e.target.value));
+          }}
+        />
+        <button
+          onClick={() => {
+            setIsRunning(!isRunning);
+            if (!isRunning) {
+              runningRef.current = true;
+              runSimmulation();
+            }
+          }}
+        >
+          {isRunning ? "Stop" : "Start"}
+        </button>
+      </form>
       <label htmlFor="speed-range"> speed: {speed} gen per second</label>
       <div className="grid-container" style={gridContainerCSS}>
         {grid.map((rows, i) =>
@@ -132,15 +148,23 @@ function App() {
       </div>
       {genCount} genrations {grid.flat(2).filter((item) => item === 1).length}{" "}
       alive
-      <button
-        onClick={() => {
-          setGrid(makeGrid);
-          setGenCount(0);
-          setIsRunning(false);
-        }}
-        // No particular reason to set innerHTML but to do it in "one line" :p
-        dangerouslySetInnerHTML={{ __html: "Reset" }}
-      />
+      <div className="btn-controls">
+        <button
+          onClick={() => {
+            reset();
+          }}
+          // No particular reason to set innerHTML but to do it in "one line" :p
+          dangerouslySetInnerHTML={{ __html: "Reset" }}
+        />
+        <button
+          onClick={() => {
+            reset();
+            setGrid(() => makeGrid(0.2));
+          }}
+        >
+          Randomize
+        </button>
+      </div>
     </main>
   );
 }
